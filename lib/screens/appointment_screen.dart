@@ -34,7 +34,6 @@ class _BookAppointmentState extends State<BookAppointment> {
   @override
   void initState() {
     super.initState();
-    // _generateTimeSlots();
 
     _loadUserProfile();
   }
@@ -56,21 +55,6 @@ class _BookAppointmentState extends State<BookAppointment> {
       });
     }
   }
-// void _generateTimeSlots() {
-//   _timeSlots = List.generate(35, (i) {
-//     final h = 9 + (i ~/ 3);
-//     final m = (i % 3) * 20;
-//     final endM = m + 20 > 59 ? 0 : m + 20;
-//     final endH = m + 20 > 59 ? h + 1 : h;
-
-//     final startH = h.toString().padLeft(2, '0');
-//     final startM = m.toString().padLeft(2, '0');
-//     final endHStr = endH.toString().padLeft(2, '0');
-//     final endMStr = endM.toString().padLeft(2, '0');
-
-//     return '$startH:$startM - $endHStr:$endMStr';
-//   }).where((s) => int.parse(s.split('-')[0].split(':')[0]) < 17).toList();
-// }
 Future<void> _showTimeSlotDialog() async {
   if (_selectedDate == null) return;
 
@@ -116,8 +100,7 @@ Future<void> _showTimeSlotDialog() async {
   );
 }
 
-
-//i wnat to add a date picker for optional date for menses date
+// Show date picker for last Menses date
 Future<void> _pickMensesDate() async {
     final picked = await showDatePicker(
         
@@ -129,13 +112,13 @@ Future<void> _pickMensesDate() async {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.light(
-              primary: Colors.blue, // Header background color
-              onPrimary: Colors.white, // Header text color
-              onSurface: Colors.black, // Body text color
+              primary: Colors.blue, 
+              onPrimary: Colors.white, 
+              onSurface: Colors.black, 
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                foregroundColor: Colors.blue, // Button text color
+                foregroundColor: Colors.blue, 
               ),
             ),
           ),
@@ -156,18 +139,18 @@ Future<void> _pickMensesDate() async {
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 30)),//1 prebooking if 1 momth
+      lastDate: DateTime.now().add(const Duration(days: 30)),
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.light(
-              primary: Colors.blue, // Header background color
-              onPrimary: Colors.white, // Header text color
-              onSurface: Colors.black, // Body text color
+              primary: Colors.blue, 
+              onPrimary: Colors.white, 
+              onSurface: Colors.black, 
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                foregroundColor: Colors.blue, // Button text color
+                foregroundColor: Colors.blue,
               ),
             ),
           ),
@@ -185,67 +168,6 @@ Future<void> _pickMensesDate() async {
       });
     }
   }
-
-  // Future<void> _showTimeSlotDialog() async {
-  //   if (_selectedDate == null) {
-    
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       const SnackBar(content:  Text('Please select a date first')),
-  //     );
-  //     return;
-  //   }
-
-    
-  //   final bookedSnap = await FirebaseFirestore.instance
-  //       .collection('appointments')
-  //       .where('date', isEqualTo: Timestamp.fromDate(_selectedDate!))
-  //       .get();
-
-  //   final bookedSlots = bookedSnap.docs
-  //       .where((d) => ['pending', 'accepted'].contains(d['status']))
-  //       .map((d) => d['timeSlot'])
-  //       .toSet();
-
-  //   await showDialog(
-  //     context: context,
-  //     builder: (ctx) {
-  //       return AlertDialog(
-
-  //         backgroundColor: Colors.white,
-  //         title: const Text('Select Time Slot'),
-  //         content: SizedBox(
-            
-  //           width: double.maxFinite,
-  //           child: Wrap(
-  //             spacing: 8, runSpacing: 8,
-  //             children: _timeSlots.map((slot) {
-  //               final isBooked = bookedSlots.contains(slot);
-  //               return ChoiceChip(
-  //                 label: Text(slot),
-  //                 selected: _selectedTimeSlot == slot,
-  //                 onSelected: isBooked ? null : (_) {
-  //                   setState(() => _selectedTimeSlot = slot);
-  //                   Navigator.pop(ctx);
-  //                 },
-  //                 backgroundColor: isBooked ? Colors.red : Colors.white,
-  //                 // color: Colors.white,
-  //                 selectedColor: Colors.blue[100],
-  //                 shape: RoundedRectangleBorder(
-  //                   borderRadius: BorderRadius.circular(10),
-  //                   side: BorderSide(color: isBooked ? Colors.red : Colors.grey),
-  //                 ),
-  //               );
-  //             }).toList(),
-  //           ),
-  //         ),
-          
-  //         actions: [
-  //           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel',style: TextStyle(color: Colors.blue),)),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
 
 Future<void> _bookAppointment() async {
   if (_user == null) {
@@ -284,16 +206,12 @@ Future<void> _bookAppointment() async {
         throw 'Slot already booked';
       }
 
-      // if (data['booked'] >= data['capacity']) {
-      //   throw 'Slot is already full';
-      // }
-
-      // 1️⃣ Increase booked count
+   
       transaction.update(slotRef, {
         'booked': true,
       });
 
-      // 2️⃣ Create appointment
+   
       final appointmentRef =
           FirebaseFirestore.instance.collection('appointments').doc();
 
@@ -314,7 +232,6 @@ Future<void> _bookAppointment() async {
       });
     });
 
-    // ✅ SUCCESS UI
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Appointment booked! Waiting for approval.'),
@@ -324,7 +241,6 @@ Future<void> _bookAppointment() async {
       ),
     );
 
-    // ✅ CLEAR FORM
     _nameController.clear();
     _emailController.clear();
     _phoneController.clear();
@@ -353,8 +269,8 @@ Future<void> _bookAppointment() async {
  InputDecoration _inputDecoration(String label, IconData icon, {bool required = false}) {
   return InputDecoration(
     labelText: required ? "$label *" : label,
-    labelStyle: const TextStyle(color: Colors.grey), // Default: grey
-    floatingLabelStyle: const TextStyle(color: Colors.blue), // On focus: blue
+    labelStyle: const TextStyle(color: Colors.grey), 
+    floatingLabelStyle: const TextStyle(color: Colors.blue), 
     prefixIcon: Icon(icon, color: Colors.blue),
     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
     focusedBorder: OutlineInputBorder(
@@ -453,35 +369,9 @@ Future<void> _bookAppointment() async {
               },
             ),
             
-                    // TextFormField(
-                    //   decoration: _inputDecoration(
-                    //     _selectedDate != null ? DateFormat('dd/MM/yyyy').format(_selectedDate!) : 'Select Date',
-                    //     Icons.calendar_today,
-                    //     required: true,
-                    //   ),
-                    //   readOnly: true,
-                    //   onTap: _pickDate,
+                    const SizedBox(height: 20),
+                    const SizedBox(height: 20),
               
-                    // // ), onTap: _pickDate,
-                    // ),
-                    const SizedBox(height: 20),
-              // CustomTextField(model: FormFieldModel(label: "Time", hint: "Select time slot" ,required: true,prefixIcon: Icons.access_time), controller:
-              // TextEditingController(
-              //         text: _selectedTimeSlot ?? '',
-              //       ), readOnly: true,
-              //       onTap: _showTimeSlotDialog,
-              // ),
-                    // TextFormField(
-                    //   decoration: _inputDecoration(
-                    //     _selectedTimeSlot ?? 'Select Time',
-                    //     Icons.access_time,
-                    //     required: true,
-                    //   ),
-                    //   readOnly: true,
-                    //   onTap: _showTimeSlotDialog,
-                    // ),
-                    const SizedBox(height: 20),
-                    // 
               // 1. Add last Menses date (optional field)
               CustomTextField(model: FormFieldModel(label: "Menses Date", readOnly: true, hint: "Select Menses Date (Optional)",prefixIcon: Icons.date_range), controller: 
               TextEditingController(

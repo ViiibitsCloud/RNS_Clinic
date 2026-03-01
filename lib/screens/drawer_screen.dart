@@ -8,10 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
-// import 'package:rns_herbals_app/Admin/manage_news.dart';
-// import 'package:rns_herbals_app/Admin/manage_orders.dart';
-// import 'package:rns_herbals_app/Admin/manage_products.dart';
-
 
 class DrawerScreen extends StatefulWidget {
   const DrawerScreen({super.key});
@@ -77,7 +73,6 @@ class _DrawerScreenState extends State<DrawerScreen> {
           else
             GestureDetector(
               onTap: () {
-                // Get.toNamed('/profile');
                 Get.to(() => const ProfileScreen());
               },
               child: UserAccountsDrawerHeader(
@@ -187,18 +182,17 @@ class _DrawerScreenState extends State<DrawerScreen> {
                 Get.toNamed('/home');
               },
             ),
-            ListTile(
-              leading: const Icon(
-                Icons.camera_alt_outlined,
-                color: Colors.blue,
-              ),
-              title: const Text('Instagram Feed'),
-              onTap: () {
-                Navigator.pop(context);
-                // Get.toNamed('/instagram');
-                Get.to(() => const InstagramFeed());
-              },
-            ),
+            // ListTile(
+            //   leading: const Icon(
+            //     Icons.camera_alt_outlined,
+            //     color: Colors.blue,
+            //   ),
+            //   title: const Text('Instagram Feed'),
+            //   onTap: () {
+            //     Navigator.pop(context);
+            //     Get.to(() => const InstagramFeed());
+            //   },
+            // ),
             ListTile(
               leading: const Icon(Icons.calendar_month, color: Colors.blue),
               title: const Text('Book Appointment'),
@@ -212,32 +206,19 @@ class _DrawerScreenState extends State<DrawerScreen> {
               title: const Text('Products'),
               onTap: () {
                 Navigator.pop(context);
-                // Get.toNamed('/product');
                 Get.to(() => const ProductListScreen());
               },
               ),
-            // ListTile(
-            //   leading: const Icon(Icons.settings, color: Colors.blue),
-            //   title: const Text('settings'),
-            //   onTap: () {
-            //     Navigator.pop(context);
-            //     // Get.toNamed('/chatbot');
-            //     // Get.to('/settingsScreen')
-            //     Get.to(Settings());
-
-            //   },
-            // ),
             ListTile(
               leading: const Icon(Icons.article_outlined, color: Colors.blue),
               title: const Text('News'),
               onTap: () {
                 Navigator.pop(context);
-                // Get.toNamed('/news');
                 Get.to(() => const NewsPage());
               },
             ),
             ListTile(leading: Icon(Icons.event,color: Colors.blue,), title: Text('Camps'), onTap: () => Get.to(() => const CampsPage()), ),
-            // Spacer(),
+            Spacer(),
             ],
           
             if (user == null)
