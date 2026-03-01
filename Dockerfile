@@ -1,4 +1,4 @@
-FROM cirrusci/flutter:stable AS build
+FROM ghcr.io/cirruslabs/flutter:latest AS build
 
 WORKDIR /app
 COPY . .
@@ -9,7 +9,6 @@ FROM nginx:alpine
 
 COPY --from=build /app/build/web /usr/share/nginx/html
 
-# Add custom nginx config for Flutter routing
 RUN rm /etc/nginx/conf.d/default.conf
 RUN printf "server { \
     listen 80; \
