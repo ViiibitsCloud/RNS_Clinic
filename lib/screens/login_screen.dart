@@ -166,7 +166,7 @@ await FirebaseFirestore.instance
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Image.asset('assets/pic.png', height: 150,),
+                      Image.asset('assets/pic1.png', height: 150,),
                       const SizedBox(height: 30),
             
             

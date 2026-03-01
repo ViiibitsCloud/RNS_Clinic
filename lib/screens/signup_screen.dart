@@ -109,7 +109,7 @@ class _SignupPageState extends State<SignupPage> {
                 key: _formKey,
                 child: ListView(
                   children: [
-                     Image.asset('assets/pic.png', height: 250),
+                     Image.asset('assets/pic1.png', height: 250),
                       const SizedBox(height: 30),
             
                    CustomTextField(model: FormFieldModel(label: 'Full Name', hint: 'Please Enter Full Name',prefixIcon: Icons.person,required: true), controller: _nameController),
