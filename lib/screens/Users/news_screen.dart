@@ -1,19 +1,19 @@
+import 'package:clinic_web/screens/Users/image_viewer_screen.dart';
+import 'package:clinic_web/screens/Users/news_details_screen.dart';
 import 'package:clinic_web/widgets/Responsive_Wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
-// import 'package:rns_herbals_app/Screens/full_image_viewer.dart';
-// import 'news_detail_page.dart'; 
 class NewsPage extends StatelessWidget {
   const NewsPage({super.key});
-  //  void _openFullImage(BuildContext context, String imageUrl) {
-  // Navigator.push(
-  //   context,
-  //   // MaterialPageRoute(
-  //   //   // builder: (_) => FullImageViewer(imageUrl: imageUrl),
-  //   // ),
-  // );
-// }
+   void _openFullImage(BuildContext context, String imageUrl) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => FullImageViewer(imageUrl: imageUrl),
+    ),
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -201,7 +201,7 @@ class NewsPage extends StatelessWidget {
                 
                       if (imageUrl.isNotEmpty)
                         GestureDetector(
-                          // onTap: () => _openFullImage(context, imageUrl),
+                          onTap: () => _openFullImage(context, imageUrl),
                 
                           child: ClipRRect(
                             borderRadius: const BorderRadius.vertical(top: Radius.circular(0)),
@@ -237,7 +237,7 @@ class NewsPage extends StatelessWidget {
                                 ElevatedButton.icon(
                                   onPressed: () {
                                     Navigator.of(context).pop(); 
-                                    // Navigator.of(context).push(MaterialPageRoute(builder: (_) => NewsDetailPage(title: title, description: description, imageUrl: imageUrl, date: date)));
+                                    Navigator.of(context).push(MaterialPageRoute(builder: (_) => NewsDetailPage(title: title, description: description, imageUrl: imageUrl, date: date)));
                                   },
                                   icon: const Icon(Icons.open_in_new,color: Colors.white,),
                                   label: const Text('View Full Page',style: TextStyle(color: Colors.white),),

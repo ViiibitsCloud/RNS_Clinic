@@ -1,4 +1,5 @@
-import 'package:clinic_web/screens/Home_Screen.dart';
+import 'package:clinic_web/screens/Admin/dashboard_screen.dart';
+import 'package:clinic_web/screens/Users/Home_Screen.dart';
 import 'package:clinic_web/screens/signup_screen.dart';
 import 'package:clinic_web/widgets/Responsive_Wrapper.dart';
 import 'package:flutter/material.dart';
@@ -93,6 +94,7 @@ await FirebaseFirestore.instance
             ),
           );
           // Get.offAllNamed('/admin-home');
+          Get.to(() => const DashboardScreen());
           // Get.offAllNamed('/home');/
           Get.snackbar("Adding soon", "Admin features are being added soon.");
           

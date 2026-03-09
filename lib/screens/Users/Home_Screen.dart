@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'chatbot_screen.dart';
 // import 'drawer_screen.dart';
-import 'login_screen.dart';
+import '../login_screen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required String userName});

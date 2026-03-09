@@ -5,8 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:clinic_web/model/form_field_model.dart';
 import 'package:clinic_web/widgets/custom_text_field.dart';
-import 'login_screen.dart'; 
-// import './CartScreen.dart'; 
+import '../login_screen.dart'; 
+import 'cart_screen.dart';
 
 class ProductListScreen extends StatefulWidget {
   const ProductListScreen({super.key});
@@ -180,7 +180,7 @@ Future<void> _addToCart(Map<String, dynamic> product) async {
         actions: [
           Stack(
             children: [
-              // IconButton(icon: const Icon(Icons.shopping_cart,color: Colors.white,), onPressed: () => Get.to(() => const CartScreen())),
+              IconButton(icon: const Icon(Icons.shopping_cart,color: Colors.white,), onPressed: () => Get.to(() => const CartScreen())),
               if (cartCount > 0) Positioned(right: 8, top: 8, child: CircleAvatar(radius: 8, backgroundColor: Colors.red, child: Text('$cartCount', style: const TextStyle(fontSize: 10)))),
             ],
           ),

@@ -1,8 +1,8 @@
-import 'package:clinic_web/screens/appointment_screen.dart';
-import 'package:clinic_web/screens/camps_screen.dart';
-import 'package:clinic_web/screens/instafeed_screen.dart';
-import 'package:clinic_web/screens/news_screen.dart';
-import 'package:clinic_web/screens/product_screen.dart';
+import 'package:clinic_web/screens/Users/appointment_screen.dart';
+import 'package:clinic_web/screens/Users/camps_screen.dart';
+import 'package:clinic_web/screens/Users/instafeed_screen.dart';
+import 'package:clinic_web/screens/Users/news_screen.dart';
+import 'package:clinic_web/screens/Users/product_screen.dart';
 import 'package:clinic_web/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';

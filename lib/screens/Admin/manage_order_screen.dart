@@ -1,0 +1,352 @@
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
+
+class ManageOrders extends StatefulWidget {
+  const ManageOrders({super.key});
+
+  @override
+  State<ManageOrders> createState() => _ManageOrdersState();
+}
+
+class _ManageOrdersState extends State<ManageOrders> {
+  String _searchQuery = '';
+  String _filterStatus = 'all';
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey[50],
+      appBar: AppBar(
+        title: const Text('Manage Orders',style: TextStyle(color: Colors.white),),
+      
+         backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.filter_list, color: Colors.white),
+            onPressed: _showFilterDialog,
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          // Search Bar
+          Padding(
+          // when rthe order is marked as cancelled it should update the stock of the products in the order
+            padding: 
+            const EdgeInsets.all(12),
+            child: TextField(
+              
+              onChanged: (val) => setState(() => _searchQuery = val.toLowerCase()),
+              decoration: InputDecoration(
+                hintText: 'Search by order ID, user, or product',
+                prefixIcon: const Icon(Icons.search),
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+              ),
+            ),
+          ),
+
+          Expanded(
+            child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance.collection('orders').snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Colors.red)));
+                }
+                if (!snapshot.hasData) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                var orders = snapshot.data!.docs;
+
+                if (_filterStatus != 'all') {
+                  orders = orders.where((doc) => (doc['status'] ?? 'pending') == _filterStatus).toList();
+                }
+
+                if (_searchQuery.isNotEmpty) {
+                  orders = orders.where((doc) {
+                    final data = doc.data() as Map<String, dynamic>;
+                    final orderId = doc.id.toLowerCase();
+                    final userName = (data['userName'] ?? '').toString().toLowerCase();
+                    final items = data['items'] as List<dynamic>? ?? [];
+                    final productNames = items.map((i) => (i['name'] ?? '').toString().toLowerCase()).join(' ');
+                    return orderId.contains(_searchQuery) ||
+                        userName.contains(_searchQuery) ||
+                        productNames.contains(_searchQuery);
+                  }).toList();
+                }
+
+                if (orders.isEmpty) {
+                  return const Center(child: Text('No orders found'));
+                }
+
+                return ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  itemCount: orders.length,
+                  itemBuilder: (context, index) {
+                    final orderDoc = orders[index];
+                    final data = orderDoc.data() as Map<String, dynamic>;
+                    final orderId = orderDoc.id;
+                                    final isCancelled = data['status'] == 'cancelled';
+
+                    return Card(
+                      margin: const EdgeInsets.symmetric(vertical: 6),
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      child: ExpansionTile(
+                        leading: CircleAvatar(
+                          backgroundColor: _getStatusColor(data['status']),
+                          child: Text(orderId.substring(0, 2).toUpperCase(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                        ),
+                        title: Text('Order #$orderId', style: const TextStyle(fontWeight: FontWeight.bold)),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('${data['userName'] ?? 'Unknown User'} • ${data['userPhone'] ?? ''}'),
+                            Text('Total: ₹${data['totalPrice']}', style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                        trailing: _buildStatusChip(data['status']),
+                        children: [
+                          const Divider(height: 1),
+                          Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                               
+                                ...((data['items'] as List<dynamic>?) ?? []).map((item) => Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 4),
+                                      child: Row(
+                                        children: [
+                                          if (item['imageUrl'] != null && (item['imageUrl'] as String).isNotEmpty)
+                                            ClipRRect(
+                                              borderRadius: BorderRadius.circular(8),
+                                              child: Image.network(item['imageUrl'], width: 40, height: 40, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const Icon(Icons.image, size: 40)),
+                                            ),
+                                          const SizedBox(width: 8),
+                                          Expanded(child: Text('${item['name']}')),
+                                          Text('x${item['quantity']}'),
+                                          Text(' ₹${(item['price'] * item['quantity']).toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                                        ],
+                                      ),
+                                    )),
+
+                                const SizedBox(height: 12),
+                                const Divider(),
+
+                                Row(
+                                  children: [
+                                    const Icon(Icons.location_on, size: 16),
+                                    const SizedBox(width: 4),
+                                    Expanded(child: Text(data['address'] ?? 'No address')),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    const Text('Status: ', style: TextStyle(fontWeight: FontWeight.bold)),
+
+DropdownButton<String>(
+  value: data['status'] ?? 'pending',
+  items: ['pending', 'processing', 'shipped', 'delivered', 'cancelled']
+      .map((s) => DropdownMenuItem(
+            value: s,
+            child: Text(s.capitalizeFirst!),
+          ))
+      .toList(),
+  onChanged: isCancelled
+      ? null // 🔒 Disable dropdown
+      : (newStatus) async {
+          if (newStatus == null) return;
+
+          if (newStatus == 'cancelled') {
+            await _cancelOrderWithStockRestore(orderDoc.reference, data);
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Order cancelled & stock restored'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          } else {
+            await _updateStatus(orderDoc.reference, newStatus);
+          }
+        },
+),
+if (isCancelled)
+  const Text(
+    'This order is cancelled ',
+    style: TextStyle(color: Colors.red, fontSize: 12),
+  ),
+
+
+                                    // DropdownButton<String>(
+                                    //   value: data['status'] ?? 'pending',
+                                    //   items: ['pending', 'processing', 'shipped', 'delivered', 'cancelled']
+                                    //       .map((s) => DropdownMenuItem(value: s, child: Text(s.capitalizeFirst!)))
+                                    //       .toList(),
+                                    //   onChanged: (newStatus) async {
+                                        // if (newStatus == 'cancelled' && data['status'] != 'cancelled') {
+                                        //   // Restore stock for all items in the order
+                                        //   final items = data['items'] as List<dynamic>? ?? [];
+                                        //   for (var item in items) {
+                                        //     final productRef = FirebaseFirestore.instance.collection('products').doc(item['productId']);
+                                        //     // 
+                                        //     //await _updateStock(productRef, item['quantity']);
+                                        //     await _restoreStockTransactional(items);
+
+                                        //   }
+                                        // }
+                                        // await _updateStatus(orderDoc.reference, newStatus);
+                                      // },
+                                    // ),/
+                                  ],
+                                ),
+                                   
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+
+Future<void> _cancelOrderWithStockRestore(
+  DocumentReference orderRef,
+  Map<String, dynamic> orderData,
+) async {
+  final firestore = FirebaseFirestore.instance;
+
+  await firestore.runTransaction((transaction) async {
+    final orderSnap = await transaction.get(orderRef);
+    final currentStatus = orderSnap['status'];
+
+    // 🔒 Prevent double cancel or updates
+    if (currentStatus == 'cancelled') {
+      throw Exception('Order already cancelled');
+    }
+
+    final items = orderData['items'] as List<dynamic>? ?? [];
+
+    // ✅ Restore stock
+    for (final item in items) {
+      final productRef =
+          firestore.collection('products').doc(item['productId']);
+      final productSnap = await transaction.get(productRef);
+
+      final currentStock = productSnap['quantity'] ?? 0;
+      transaction.update(productRef, {
+        'quantity': currentStock + (item['quantity'] as int),
+      });
+    }
+
+    // ✅ Update order status
+    transaction.update(orderRef, {
+      'status': 'cancelled',
+      'cancelledAt': FieldValue.serverTimestamp(),
+    });
+  });
+}
+
+  void _showFilterDialog() {
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(16),
+        decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Filter by Status', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+            ...['all', 'pending', 'processing', 'shipped', 'delivered', 'cancelled'].map((status) => RadioListTile<String>(
+                  title: Text(status == 'all' ? 'All Orders' : status.capitalizeFirst!),
+                  value: status,
+                  groupValue: _filterStatus,
+                  onChanged: (val) {
+                    setState(() => _filterStatus = val!);
+                    Get.back();
+                  },
+                )),
+          ],
+        ),
+      ),
+
+    );
+  }
+Future<void> _updateStock(DocumentReference productRef, int quantity) async {
+    final productSnap = await productRef.get();
+    if (productSnap.exists) {
+      final data = productSnap.data() as Map<String, dynamic>;
+      final currentStock = data['stock'] ?? 0;
+      await productRef.update({'stock': currentStock + quantity});
+    }
+  }
+  Future<void> _restoreStockTransactional(List items) async {
+  final firestore = FirebaseFirestore.instance;
+  await firestore.runTransaction((transaction) async {
+    for (var item in items) {
+      final ref = firestore.collection('products').doc(item['productId']);
+      final snap = await transaction.get(ref);
+      final currentStock = snap['stock'] ?? 0;
+      transaction.update(ref, {'stock': currentStock + item['quantity']});
+    }
+  });
+}
+
+
+  Future<void> _updateStatus(DocumentReference ref, String? newStatus) async {
+    if (newStatus == null) return;
+    final confirm = await Get.dialog(
+      AlertDialog(
+        title: const Text('Update Status'),
+        content: Text('Change status to "$newStatus"?'),
+        actions: [
+          TextButton(onPressed: () => Get.back(result: false), child: const Text('Cancel')),
+          ElevatedButton(onPressed: () => Get.back(result: true), child: const Text('Update')),
+        ],
+      ),
+    );
+    if (confirm == true) {
+      await ref.update({'status': newStatus});
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content:  Text('Status updated to $newStatus'),
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 5)
+          ),
+        );
+    }
+  }
+
+  Color _getStatusColor(String? status) {
+    switch (status) {
+      case 'pending': return Colors.orange;
+      case 'processing': return Colors.blue;
+      case 'shipped': return Colors.purple;
+      case 'delivered': return Colors.green;
+      case 'cancelled': return Colors.red;
+      default: return Colors.grey;
+    }
+  }
+
+  Widget _buildStatusChip(String? status) {
+    return Chip(
+      label: Text(status?.capitalizeFirst ?? 'Pending', style: const TextStyle(color: Colors.white)),
+      backgroundColor: _getStatusColor(status),
+    );
+  }
+}
