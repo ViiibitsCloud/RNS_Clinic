@@ -1,7 +1,11 @@
 FROM ghcr.io/cirruslabs/flutter:latest AS build
 
+ARG SUPABASE_URL
+ARG SUPABASE_ANON_KEY
+
 WORKDIR /app
 COPY . .
+RUN printf "SUPABASE_URL=%s\nSUPABASE_ANON_KEY=%s\n" "$SUPABASE_URL" "$SUPABASE_ANON_KEY" > .env
 RUN flutter pub get
 RUN flutter build web --release
 
