@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
-
+import 'package:flutter/foundation.dart';
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
   @override
@@ -85,7 +85,10 @@ class _SignupPageState extends State<SignupPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Sign Up',style: TextStyle(color: Colors.white),
+      backgroundColor: Colors.white,
+      appBar: kIsWeb
+      ? null
+      : AppBar(title: const Text('Sign Up',style: TextStyle(color: Colors.white),
     
       ),
       centerTitle: true,
