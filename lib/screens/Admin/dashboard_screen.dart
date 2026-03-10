@@ -39,7 +39,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     const AdminAppointments(),
     const ManageNews(),
     const ManageCamps(),
-    // const ManageProducts(),
+    const ManageProducts(),
     const ManageOrders(),
     const ManageClinicSettings(),
       const ManageSlots(),

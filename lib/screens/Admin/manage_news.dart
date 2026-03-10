@@ -1091,7 +1091,8 @@ class _ManageNewsState extends State<ManageNews> {
 
       if (_imageFile != null || _webImage != null) {
         imageUrl = await SupabaseService.uploadImage(
-          imageFile: _imageFile,
+          // imageFile: _imageFile,
+           image: _imageFile!,
           webImage: _webImage,
           bucket: "news",
           folder: "posts",
@@ -1132,7 +1133,8 @@ class _ManageNewsState extends State<ManageNews> {
 
     if (_imageFile != null || _webImage != null) {
       imageUrl = await SupabaseService.uploadImage(
-        imageFile: _imageFile,
+        // imageFile: _imageFile,
+         image: _imageFile!,
         webImage: _webImage,
         bucket: "news",
         folder: "posts",

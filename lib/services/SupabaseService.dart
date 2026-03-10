@@ -69,7 +69,7 @@ class SupabaseService {
     File? imageFile,
     Uint8List? webImage,
     required String bucket,
-    required String folder,
+    required String folder, required File image,
   }) async {
     try {
       final fileName =
