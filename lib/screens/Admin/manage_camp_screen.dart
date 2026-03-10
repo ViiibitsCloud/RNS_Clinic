@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:clinic_web/model/form_field_model.dart';
 import 'package:clinic_web/services/NotificationService.dart';
 import 'package:clinic_web/widgets/custom_text_field.dart';
-
+import 'package:flutter/foundation.dart';
 class ManageCamps extends StatefulWidget {
   const ManageCamps({super.key});
   @override
@@ -278,7 +278,9 @@ class _ManageCampsState extends State<ManageCamps> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
-      appBar: AppBar(
+      appBar: kIsWeb 
+      ? null 
+      : AppBar(
         title: const Text('Manage Camps'),
         centerTitle: true,
         backgroundColor: Colors.blue,

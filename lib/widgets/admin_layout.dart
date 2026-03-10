@@ -27,6 +27,8 @@ class _AdminLayoutState extends State<AdminLayout> {
     {"icon": Icons.local_hospital, "title": "Manage Camps"},
     {"icon": Icons.inventory, "title": "Manage Products"},
     {"icon": Icons.shopping_cart, "title": "Manage Orders"},
+    {"icon": Icons.settings, "title": "Clinic Settings"},
+    {"icon": Icons.schedule, "title": "Manage Slots"},
     {"icon":Icons.person,"title":"Profile"},
   ];
 

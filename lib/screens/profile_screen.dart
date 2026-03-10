@@ -2,6 +2,7 @@
 
 import 'dart:io';
 import 'package:clinic_web/widgets/Responsive_Wrapper.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -163,12 +164,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     try {
       await _firestore.collection('users').doc(_user!.uid).set({
-        'name': _nameController.text.trim(),
-        'phone': _phoneController.text.trim(),
-        'address': _addressController.text.trim(),
-        'gender': _selectedGender,
-        'updatedAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
+  'fullName': _nameController.text.trim(),
+  'phoneNumber': _phoneController.text.trim(),
+  'address': _addressController.text.trim(),
+  'gender': _selectedGender,
+  'updatedAt': FieldValue.serverTimestamp(),
+}, SetOptions(merge: true));
+      // await _firestore.collection('users').doc(_user!.uid).set({
+      //   'name': _nameController.text.trim(),
+      //   'phone': _phoneController.text.trim(),
+      //   'address': _addressController.text.trim(),
+      //   'gender': _selectedGender,
+      //   'updatedAt': FieldValue.serverTimestamp(),
+      // }, SetOptions(merge: true));
 
      
       ScaffoldMessenger.of(context).showSnackBar(
@@ -197,7 +205,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return Scaffold(
       backgroundColor: Colors.grey[50],
-      appBar: AppBar(
+      appBar: kIsWeb 
+      ? null 
+      : AppBar(
         title: const Text('Edit Profile', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,

@@ -5,7 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 // import 'package:clinic_web/screens/drawer_screen.dart';
 import 'package:clinic_web/model/form_field_model.dart';
 import 'package:clinic_web/widgets/custom_text_field.dart';
-
+import 'package:flutter/foundation.dart';
 class AdminAppointments extends StatefulWidget {
   const AdminAppointments({super.key});
 
@@ -116,7 +116,9 @@ await FirebaseFirestore.instance.collection('notifications').add({
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
+      appBar: kIsWeb ?
+      null 
+      : AppBar(
         title: const Text('Manage Appointments',style: TextStyle(
           color: Colors.white
         ),),

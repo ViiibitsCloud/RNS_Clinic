@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
-
+import 'package:flutter/foundation.dart';
 class ManageOrders extends StatefulWidget {
   const ManageOrders({super.key});
 
@@ -17,7 +17,9 @@ class _ManageOrdersState extends State<ManageOrders> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
-      appBar: AppBar(
+      appBar: kIsWeb
+      ? null
+      : AppBar(
         title: const Text('Manage Orders',style: TextStyle(color: Colors.white),),
       
          backgroundColor: Colors.blue,
